@@ -1,0 +1,29 @@
+appId: com.maestro.test
+name: Login
+---
+- launchApp
+- runScript: scripts/login.js
+- runFlow:
+    file: subflows/input.yaml
+    env:
+        INPUT_ID: username-input
+        TEXT: ${output.login.username}
+- runFlow:
+    file: subflows/input.yaml
+    env:
+        INPUT_ID: password-input
+        TEXT: bad
+
+- assertVisible:
+    text: 'Connexion échouée'
+
+- runFlow:
+    file: subflows/input.yaml
+    env:
+        INPUT_ID: password-input
+        TEXT: ${output.login.password}
+
+- assertVisible:
+    text: 'Connexion réussie'
+
+- stopApp

@@ -1,0 +1,6 @@
+appId: com.maestro.test
+---
+- tapOn:
+    id: ${INPUT_ID}
+- inputText: ${TEXT}
+- pressKey: Enter

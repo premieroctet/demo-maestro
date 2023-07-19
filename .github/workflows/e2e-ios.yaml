@@ -1,0 +1,50 @@
+name: iOS e2e maestro
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    name: E2E test
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: yarn
+      - name: Install IDB
+        run: |
+          brew tap facebook/fb
+          brew install idb-companion
+
+      - name: Install dependencies
+        run: yarn
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Build & install app
+        run: |
+          npx expo prebuild -p ios
+          gem install xcpretty
+          yarn expo prebuild -p ios
+          xcodebuild -workspace ios/maestrotest.xcworkspace -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -scheme maestrotest
+          open -a Simulator
+          sleep 10
+          xcrun simctl install booted ios/build/Build/Products/Release-iphonesimulator/maestrotest.app
+
+      - name: Run Maestro
+        run: maestro test e2e
+        env:
+          MAESTRO_DRIVER_STARTUP_TIMEOUT: 100000
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: results
+          path: ~/.maestro/tests
