@@ -33,7 +33,7 @@ jobs:
           npx expo prebuild -p ios
           gem install xcpretty
           yarn expo prebuild -p ios
-          xcodebuild -workspace ios/maestrotest.xcworkspace -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -scheme maestrotest
+          xcodebuild -workspace ios/maestrotest.xcworkspace -configuration Release -sdk iphonesimulator -derivedDataPath ios/build -scheme maestrotest | xcpretty
           open -a Simulator
           sleep 10
           xcrun simctl install booted ios/build/Build/Products/Release-iphonesimulator/maestrotest.app
